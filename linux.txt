@@ -1,0 +1,300 @@
+linux笔记
+1.linux 一切皆文件
+2.基本命令学习
+<1>pwd 查看当前的工作路径
+<2>man 查看手册
+<3>cd 切换到指定的工作路径
+<4>ls 先列出非目录文件项 后跟具体命令来执行具体操作
+-a 列出所有文件 包括隐藏的文件
+-l 查看文件的具体信息，包括类型，权限等等
+-i 文件前面显示文件Id
+-d
+-h
+不会的知识点：(ls -d 与 ls -h 不清楚作用是啥 看不出有什么变化）
+<5>查看文件
+cat filepath查看文件的全部内容
+less filepath 按屏显示
+/k 搜索
+q 退出
+<6>复制
+cp [-r]目录 srcpath(需要复制的文件路径) destpath（复制到的文件路径）
+<7>剪切
+mv srcpath destpath
+<8>删除
+rm [-rf(强制)] filepath
+<9>创建文件
+touch filename
+<10>创建目录
+mkdir dirmame
+<11>关机
+shotdown -h now
+poweroff
+init 0
+halt
+重启
+showdown -r now
+reboot
+init 6
+<12>
+history 查看历史
+
+文件管理
+<1>stat filepath查看文件属性（详细）
+<2>ls -l 查看文件信息
+文件类型
+7种文件类型：
+- regular 普通文件
+d directory 目录文件
+c charactor 字符设备文件
+b block 块设备文件
+l link 符号链接文件
+p pipe 管道文件
+s socket 套接字文件
+文件权限rwxr-xr-x
+u 拥有者
+g 所属组
+o 其他用户
+a 所有
+修改文件权限
+<1>chmod u/g/o/a +或者- r/w/x filepath
+<2>chmod 加上所需要的八位制数（666）filepath
+修改文件的所属用户和所属组
+chown user:group filepath
+
+防止权限过大的文件：
+    umask（不懂）
+
+
+
+文件的硬链接：相当于复制一个文件 但是名字不同
+（一点不懂） inode是同一个分区文件的唯一标识
+硬链接文件不能跨分区
+创建硬链接
+ln srcpath dest
+cp -l srcpath dest
+软连接：相当于快捷方式
+ln -s srcpath dest
+cp -s srcpath dest
+文件拥有者和所属组
+创建用户：useradd username
+给定密码：passwd username
+切换用户：su - username
+删除用户：userdel -r username
+登出用户：exit
+查看用户信息：
+cat /etc/passwd
+查看组信息：
+cat /etc/group
+查看密码：
+cat /etc/shadow
+组创建
+groupadd name
+组删除
+groupdell name
+用户添加到组内
+gpasswd -a user group
+用户从组内删除
+gpasswd -d user group
+文件大小：
+stat filepath
+du -sh filepath 查看filepath对应的文件所占用磁盘空间的大小
+df -h 查看磁盘分区的占用情况
+
+文件的查找：
+可执行的文件：
+which cmd
+whereis cmd
+非执行文件
+遍历数据库 locate filepath
+（不懂） 更新数据库 updatedb
+
+    find（便利磁盘空间）
+        find path options
+        options
+            -name 按名字查找
+            find  /etc  -name  "passwd"
+            -size 按文件大小查找
+            find  /etc/  -size  n 
+            -mtime  修改时间
+            find  /etc/  -mtime  n(天)
+            -type (类型)
+            find  /etc/  -type  f/d/c/b/p/l/s
+            -exec  对于查找到的结果执行
+            find  /etc/  -name  "hello"  -exec  ls  -l  {}  \;  (直接执行)
+            -ok
+            find  /etc/  -name  "hello"  -ok  ls  -l  {}  \; (执行前询问)
+            -print  打印查找结果
+            find  /etc/  -name  "hello"  -print  -exec  ls  -l  {}  \; 
+            -a  连接多个查找选项
+            find  /etc/  -type  d  -a  -size  +18k
+    
+文件的压缩包：（不懂！！！！xz格式的压缩包怎么转化为包
+C解压路径最后的格式不会）
+file 加压缩包名称 查看压缩包类型
+gunzip file.gz bunzip2 file.bz2 unzip xxxzip(压缩包解压成包)
+
+    tar  options  xx.tar.xx    file(需要压缩的文件)
+        -c   创建
+        -v   过程可见
+        -f    加在最后跟压缩包名字
+        -j    生成bz2压缩包
+        -J    生成xz压缩包
+        -z    生成gz压缩包
+        -x    解压缩
+        -t    在不解压缩的情况下查看压缩包内容
+        -r    往包里追加文件
+文件重定向 （不会）
+用户登录成功后，三个文件依次打开
+标准输入（0） 标准输出 （1） 标准错误输出 （ 2）
+0<标准输入重定向
+1>标准输出重定向
+2>标准错误输出重定向
+>>追加
+
+    |   管道    （不会）
+    
+    wc  options  filepath
+        -l     统计文件行数
+        -w    单词个数
+        -c     字符个数
+    grep  [-iwn]   key   filepath   筛选文件内容
+软件包管理
+
+二进制包（.rpm格式）
+    yum  安装：
+        yum源所在路径  /etc/yum.repo.d/xxx.repo
+        yum  install  xxxx
+        例如有如下软件包:
+            coreutils-8.22-21.el7.x86_64.rpm
+            coreutils包名
+        yum  install  coreutils  安装
+        yum  remove  coreutils  卸载
+        yum repolist  查看仓库有多少软件包
+        yum  list  列出所有软件包
+        yun  provides  filepath 查看文件对应的软件包
+        yum  update  coreutils  更新
+        yum  clean all  清除缓存
+    
+（完全不会） 本地yum源配置:
+1.将镜像文件挂载到文件系统
+2.创建镜像的挂载点 mkdir /mnt/centos7
+3.光盘镜像在/dev/cdrom目录
+4.挂载光盘镜像
+mount -t iso9660 -o loop /dev/cdrom /mnt/centos7
+5.配置镜像的yum源
+vim /etc/yum.repos.d/my.repo
+
+            [local_centos7]
+            name=centos7
+            baseurl=file:///mnt/centos7
+            enabled=1
+            gpgcheck=0
+
+    已下载的rpm软件包安装：
+        xxx.rpm
+        rpm -ivh xxxx 安装已下载的rpm包
+        rpm -e xxxx 卸载
+        rpm -U xxxx 更新
+        rpm -qa 查询系统中所有已安装的rpm包
+        rpm -qf /usr/bin/ls 查询ls对应的软件包
+网络管理：
+
+    1.查看  ip   mac   。。。。
+        ip  addr
+        ifconfig
+    
+    2.查看/启动/重启/关闭/自启动/禁用服务
+    systemcal status/start/restart/stop/enable/disable   服务名字
+    <3>手动配置静态ip地址
+    关闭NetworkManager
+        systemctl stop NetworkManager
+    配置/etc/sysconfig/network-scripts/ifcfg-xxx
+        DEVICE=eth0
+        BOOTPROTO=none
+        NM_CONTROLLED=no
+        ONBOOT=yes
+        TYPE=Ethernet
+        IPADDR=172.16.60.1
+        PREFIX=24
+        GATEWAY=172.16.60.254   
+    重启网络服务
+    systemctl restart network
+防火墙
+    关闭防火墙
+        systemctl  stop  firewalld
+        ststemctl  disable  firewalld
+    <5>vsftpd服务 ---> 文件共享
+    安装:yum install vsftpd 
+    启动:systemctl start vsftpd
+    开机自启动:systemctl enable vsftpd
+    配置文件:/etc/vsftpd/vsftpd.conf
+    
+    访问共享目录:
+    下载安装:yum install lftp
+    lftp 192.168.5.129
+    lcd --->切换下载路径
+    get filepath 下载非目录文件
+    mirror filepath 下载目录文件
+    bye 退出
+(不熟没记住)nfs远程挂载
+下载安装:
+yum install nfs-utils rpcbind
+启动:
+systemctl start nfs
+systemctl enable nfs
+systemctl start rpcbind
+systemctl enable rpcbind
+编辑共享路径:
+vim /etc/exports
+/var/ftp/pub *(ro,sync,no_root_squash)
+
+    客户端挂载:
+        mount 192.168.5.129:/var/ftp/pub /mnt
+进程管理：
+    查看进程  
+        ps  aux
+    终止进程
+        kill  -9
+    实时查看运行状态     top
+git命令
+git status 查看仓库状态
+git add 追踪
+git commit -m “备注” 提交到仓库
+git push 提交到远程仓库
+git pull 下载到本地仓库
+git status 查看仓库状态
+git log 查看仓库日志
+git resrt --hard id 切换到指定版本
+git reflog 查看最新版本日志
+
+
+
+vim 编辑器的使用：
+vim filepath --->打开 --->一般模式
+--->进入编辑模式编辑(iIaAoOsS)
+--->从编辑模式进入到一般模式(Esc / Ctrl+c)
+--->从一般模式进入到命令行模式(:w 保存 ：q 退出)
+一般模式：
+2yy 	复制两行
+p   	粘贴
+2dd 	剪切两行
+u   	撤销
+Ctrl+r 	还原
+x/X 	删除光标字符
+r		替换
+R 		一直替换到Esc为止
+块选择：
+Ctrl+v 	方向键选择
+gg 		首行
+GG 		末行
+5G 		第五行
+命令行模式：
+w 		保存
+q 		退出
+q！		强制退出
+w filpath 	另存为
+%s /old/new/g 将所有的old替换为new
+2,5s/old/new/g 将第二行到第五行的old 替换为new
+set nonumber  取消行号
+set nu 	 显示行号
+set ts=4 将Tab设置为4个字符宽度
